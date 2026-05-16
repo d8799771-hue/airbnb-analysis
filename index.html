@@ -333,7 +333,7 @@
             <span class="stat-label">Cities</span>
         </div>
         <div class="stat">
-            <span class="stat-number">6</span>
+            <span class="stat-number">7</span>
             <span class="stat-label">Key Insights</span>
         </div>
         <div class="stat">
@@ -515,6 +515,34 @@
     </div>
 </section>
 
+<!-- INSIGHT 7 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 07</p>
+            <h2>Booking Activity Affects Price <em>Differently</em> in Each City</h2>
+            <div class="divider"></div>
+            <p>The relationship between recent booking activity and price varies dramatically by city - with <strong>no universal pattern</strong> across markets.</p>
+            <div class="pills">
+                <span class="pill red">Barcelona - more activity = higher price</span>
+                <span class="pill green">Amsterdam - more activity = lower price</span>
+                <span class="pill">London - gentle decline</span>
+                <span class="pill">Rome - stable throughout</span>
+                <span class="pill">Bangkok - no effect</span>
+            </div>
+            <p>In <strong>Barcelona</strong>, the most actively booked listings charge the highest prices - statistically confirmed by narrow confidence intervals throughout. In <strong>Amsterdam</strong>, the opposite is true - popular listings are actually cheaper, though this finding carries more uncertainty.</p>
+            <div class="highlight green">
+                Practical tip for guests: In Barcelona, popular listings cost more - book early. In Amsterdam, popular listings may actually offer better value than less reviewed ones.
+            </div>
+            <p>This finding was confirmed using a <strong>lineplot</strong> with 95% confidence intervals, showing that booking activity is a city-specific price signal rather than a universal one.</p>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight7.png" alt="Price Trend by Recent Booking Activity and City">
+            <p class="chart-caption">Fig 7. Median nightly price trend by recent booking activity level per city. Shaded areas represent 95% confidence intervals. Created using sns.lineplot.</p>
+        </div>
+    </div>
+</section>
+
 <!-- CONCLUSION -->
 <section class="conclusion">
     <div class="container">
@@ -522,7 +550,7 @@
             <p class="section-number" style="text-align:center">Conclusion</p>
             <h2>What Really Drives <em>Airbnb Prices?</em></h2>
             <div class="divider" style="margin: 24px auto;"></div>
-            <p>Our investigation across 139,950 listings in 5 global cities reveals that Airbnb nightly prices are driven by a combination of factors — none acting alone.</p>
+            <p>Our investigation across 139,950 listings in 5 global cities reveals that Airbnb nightly prices are driven by a combination of factors — none acting alone. Through 7 key insights we uncovered both universal patterns and surprising city-specific dynamics.</p>
             <p><strong>Room type</strong> is the most universal driver, consistently separating prices across all cities. <strong>City and neighbourhood</strong> matter enormously at the global level, with Bangkok offering prices 4-6x lower than European cities, and Amsterdam's central neighbourhoods commanding the highest prices of all.</p>
             <p><strong>Host type, minimum stay requirements, and review activity</strong> all play secondary but meaningful roles — professional hosts charge more, the 4-7 night sweet spot commands premium prices, and popular listings naturally converge toward market-fair pricing over time.</p>
             <p style="margin-top: 24px; font-style: italic; color: #666;">Daniel · Introduction to Data Science · Reichman University 2026</p>
