@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airbnb Global Price Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f0f;
+            --bg2: #161616;
+            --bg3: #1e1e1e;
+            --accent: #FF5A5F;
+            --accent2: #00A699;
+            --gold: #FFB400;
+            --text: #f0f0f0;
+            --text-muted: #888;
+            --border: rgba(255,255,255,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* HERO */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 20px;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 60% 40%, rgba(255,90,95,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 20% 80%, rgba(0,166,153,0.08) 0%, transparent 50%),
+                        var(--bg);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .hero-tag {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 24px;
+            font-weight: 500;
+            opacity: 0;
+            animation: fadeUp 0.8s ease forwards;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.2s forwards;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 48px;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.4s forwards;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeUp 0.8s ease 0.6s forwards;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* SECTIONS */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section {
+            padding: 100px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .section-number {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 24px;
+        }
+
+        .section h2 em {
+            color: var(--accent);
+            font-style: italic;
+        }
+
+        .section p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 680px;
+            margin-bottom: 16px;
+        }
+
+        .section p strong {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* CHART */
+        .chart-wrap {
+            margin-top: 48px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chart-wrap img {
+            width: 100%;
+            display: block;
+        }
+
+        .chart-caption {
+            padding: 16px 24px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            font-style: italic;
+        }
+
+        /* HIGHLIGHT BOX */
+        .highlight {
+            background: var(--bg3);
+            border-left: 3px solid var(--accent);
+            border-radius: 0 8px 8px 0;
+            padding: 20px 24px;
+            margin: 24px 0;
+            font-size: 1.05rem;
+            color: var(--text);
+        }
+
+        .highlight.green { border-color: var(--accent2); }
+        .highlight.gold { border-color: var(--gold); }
+
+        /* PILLS */
+        .pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .pill {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .pill.red { border-color: var(--accent); color: var(--accent); }
+        .pill.green { border-color: var(--accent2); color: var(--accent2); }
+        .pill.gold { border-color: var(--gold); color: var(--gold); }
+
+        /* DATASET OVERVIEW */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 48px;
+        }
+
+        .overview-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 24px;
+            transition: border-color 0.3s;
+        }
+
+        .overview-card:hover { border-color: var(--accent); }
+
+        .overview-card .num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .overview-card .label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* CONCLUSION */
+        .conclusion {
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,90,95,0.15) 0%, transparent 60%),
+                        var(--bg2);
+            padding: 100px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+        }
+
+        .conclusion h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            margin-bottom: 24px;
+        }
+
+        .conclusion p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 640px;
+            margin: 0 auto 16px;
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 40px 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        footer a { color: var(--accent); text-decoration: none; }
+
+        /* ANIMATIONS */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            margin: 24px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    <p class="hero-tag">Introduction to Data Science &nbsp;·&nbsp; Reichman University 2026</p>
+    <h1>What Drives the <span>Price</span> of an Airbnb Night?</h1>
+    <p class="hero-sub">A data investigation across 5 major global cities — London, Rome, Bangkok, Barcelona, and Amsterdam — using over 139,000 listings scraped in March 2026.</p>
+    <div class="hero-stats">
+        <div class="stat">
+            <span class="stat-number">139K</span>
+            <span class="stat-label">Listings Analyzed</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">5</span>
+            <span class="stat-label">Cities</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">6</span>
+            <span class="stat-label">Key Insights</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number">2026</span>
+            <span class="stat-label">Data Scraped</span>
+        </div>
+    </div>
+</section>
+
+<!-- DATASET OVERVIEW -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Dataset Overview</p>
+            <h2>About the <em>Data</em></h2>
+            <div class="divider"></div>
+            <p>The dataset was compiled from <strong>Inside Airbnb</strong> and obtained via Kaggle. It covers Airbnb listings scraped in March 2026 across major world cities. After filtering for valid price data, our working dataset contains <strong>139,950 listings</strong> across 5 cities.</p>
+            <p>All prices are expressed in <strong>USD equivalent</strong>. Note: Bangkok prices required a currency correction from Thai Baht to USD — a key data quality finding of this project.</p>
+        </div>
+        <div class="overview-grid fade-in">
+            <div class="overview-card">
+                <span class="num">61,963</span>
+                <span class="label">London listings</span>
+            </div>
+            <div class="overview-card">
+                <span class="num">33,564</span>
+                <span class="label">Rome listings</span>
+            </div>
+            <div class="overview-card">
+                <span class="num">23,273</span>
+                <span class="label">Bangkok listings</span>
+            </div>
+            <div class="overview-card">
+                <span class="num">15,276</span>
+                <span class="label">Barcelona listings</span>
+            </div>
+            <div class="overview-card">
+                <span class="num">5,874</span>
+                <span class="label">Amsterdam listings</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 1 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 01</p>
+            <h2>Room Type and City are the <em>Strongest</em> Price Drivers</h2>
+            <div class="divider"></div>
+            <p>Across all 5 cities, the price ordering by room type is consistent and universal:</p>
+            <div class="pills">
+                <span class="pill red">Hotel room — Highest</span>
+                <span class="pill">Entire home/apt</span>
+                <span class="pill">Private room</span>
+                <span class="pill green">Shared room — Lowest</span>
+            </div>
+            <p>This pattern holds regardless of city, confirming that <strong>what type of space you rent matters more than where it is located</strong>. Amsterdam charges the highest median prices for entire homes (250 USD) and London leads for hotel rooms (280 USD).</p>
+            <div class="highlight">
+                London hotel rooms command nearly 280 USD per night median — while Bangkok hotel rooms cost just 47 USD, highlighting the dual influence of both room type and city.
+            </div>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight1.png" alt="Median Nightly Price by Room Type and City">
+            <p class="chart-caption">Fig 1. Median nightly price by room type and city. Median used instead of mean to avoid distortion from extreme outliers.</p>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 2 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 02</p>
+            <h2>Bangkok is a Global <em>Budget Outlier</em> — and a Data Quality Lesson</h2>
+            <div class="divider"></div>
+            <p>Bangkok stands clearly apart from all European cities in terms of nightly price. After discovering and correcting a <strong>currency error</strong> (Bangkok prices were stored in Thai Baht rather than USD), Bangkok's median price of approximately <strong>35 USD per night</strong> is roughly 4-6x cheaper than any European city in the dataset.</p>
+            <div class="highlight gold">
+                Data Science Lesson: Always validate your data before drawing conclusions. The uncorrected data showed Bangkok as the most expensive city — completely wrong. Careful investigation revealed the currency issue and allowed us to correct it.
+            </div>
+            <p>This insight highlights an important principle — <strong>data quality investigation is as important as the analysis itself</strong>.</p>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight2.png" alt="Distribution of Nightly Price by City">
+            <p class="chart-caption">Fig 2. KDE distribution of nightly prices by city on a logarithmic scale. Bangkok (green) clearly clusters at much lower prices than European cities.</p>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 3 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 03</p>
+            <h2>Professional Hosts <em>Charge More</em> Than Casual Hosts</h2>
+            <div class="divider"></div>
+            <p>A counterintuitive finding: <strong>professional hosts</strong> (managing 6+ listings) consistently charge higher median prices than <strong>casual hosts</strong> (1-5 listings) in almost every city.</p>
+            <div class="pills">
+                <span class="pill">59.3% Casual Hosts</span>
+                <span class="pill red">40.7% Professional Hosts</span>
+            </div>
+            <p>One might expect professional operators to offer more competitive prices due to economies of scale. Instead, the opposite is true — professional hosts price higher, possibly because they offer higher quality properties, have optimized their pricing strategy, and tend to list entire homes rather than spare rooms.</p>
+            <div class="highlight">
+                The gap is most pronounced in London (~50 USD difference) and Barcelona (~45 USD difference), while Amsterdam and Bangkok show minimal differences.
+            </div>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight3.png" alt="Professional vs Casual Hosts Pricing">
+            <p class="chart-caption">Fig 3. Median nightly price comparison between professional and casual hosts by city.</p>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 4 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 04</p>
+            <h2>Amsterdam is <em>Surprisingly Expensive</em> Despite Being the Smallest Market</h2>
+            <div class="divider"></div>
+            <p>Amsterdam dominates the top 10 most expensive neighbourhoods globally, claiming <strong>8 out of 10 spots</strong>. This is remarkable given that Amsterdam has the fewest listings (5,874) of all 5 cities in our dataset.</p>
+            <div class="highlight green">
+                De Pijp - Rivierenbuurt is the single most expensive neighbourhood in our entire dataset at approximately 250 USD per night median — beating all London and European neighbourhoods.
+            </div>
+            <p>Amsterdam's Airbnb market is characterized by a concentration of listings in premium central neighbourhoods, high demand relative to limited supply due to <strong>strict housing regulations</strong>, and a market where scarcity drives prices up despite lower overall listing volume.</p>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight4.png" alt="Top 10 Most Expensive Neighbourhoods">
+            <p class="chart-caption">Fig 4. Top 10 most expensive neighbourhoods globally (minimum 50 listings). Amsterdam dominates with 8 out of 10 spots.</p>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 5 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 05</p>
+            <h2>The <em>4-7 Night</em> Sweet Spot Commands Premium Prices</h2>
+            <div class="divider"></div>
+            <p>Listings requiring 4-7 night minimum stays tend to command the <strong>highest nightly prices</strong> across most European cities. After this sweet spot, prices generally decline for longer minimum stay requirements.</p>
+            <div class="pills">
+                <span class="pill">1 night — Standard</span>
+                <span class="pill">2-3 nights — Slight rise</span>
+                <span class="pill red">4-7 nights — Peak prices</span>
+                <span class="pill">8-30 nights — Declining</span>
+                <span class="pill green">30+ nights — Lowest</span>
+            </div>
+            <p>The 4-7 night bracket corresponds to <strong>full week rentals</strong> that attract higher-value tourists. Listings requiring 30+ nights are effectively long-term rentals where hosts discount their nightly rate to secure guaranteed longer bookings.</p>
+            <div class="highlight">
+                This insight is useful for hosts: requiring a 4-7 night minimum may allow charging higher nightly rates while still attracting quality guests.
+            </div>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight5.png" alt="Price Trend by Minimum Stay Length">
+            <p class="chart-caption">Fig 5. Median nightly price trend across minimum stay brackets by city. Points show median price, lines show the trend direction.</p>
+        </div>
+    </div>
+</section>
+
+<!-- INSIGHT 6 -->
+<section class="section">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number">Insight 06</p>
+            <h2>Popular Listings <em>Converge</em> Toward Mid-Range Pricing</h2>
+            <div class="divider"></div>
+            <p>Listings with more reviews tend to have <strong>less price variance</strong> and converge toward the 100-300 USD range in European cities. This suggests a natural market self-correction mechanism.</p>
+            <p>Listings with <strong>very few reviews (1-3)</strong> show the highest price variance — new listings have not yet found their optimal market price. As listings accumulate more reviews, extreme prices become less common — the market naturally filters out unreasonably priced listings over time.</p>
+            <div class="highlight green">
+                This suggests that experience and market feedback play an important role in price optimization — hosts learn from their booking history and adjust prices accordingly over time.
+            </div>
+        </div>
+        <div class="chart-wrap fade-in">
+            <img src="insight6.png" alt="Price vs Number of Reviews by City">
+            <p class="chart-caption">Fig 6. Price vs. number of reviews scatter plot by city (log-log scale, 5,000 random listings sampled for clarity).</p>
+        </div>
+    </div>
+</section>
+
+<!-- CONCLUSION -->
+<section class="conclusion">
+    <div class="container">
+        <div class="fade-in">
+            <p class="section-number" style="text-align:center">Conclusion</p>
+            <h2>What Really Drives <em>Airbnb Prices?</em></h2>
+            <div class="divider" style="margin: 24px auto;"></div>
+            <p>Our investigation across 139,950 listings in 5 global cities reveals that Airbnb nightly prices are driven by a combination of factors — none acting alone.</p>
+            <p><strong>Room type</strong> is the most universal driver, consistently separating prices across all cities. <strong>City and neighbourhood</strong> matter enormously at the global level, with Bangkok offering prices 4-6x lower than European cities, and Amsterdam's central neighbourhoods commanding the highest prices of all.</p>
+            <p><strong>Host type, minimum stay requirements, and review activity</strong> all play secondary but meaningful roles — professional hosts charge more, the 4-7 night sweet spot commands premium prices, and popular listings naturally converge toward market-fair pricing over time.</p>
+            <p style="margin-top: 24px; font-style: italic; color: #666;">Daniel · Introduction to Data Science · Reichman University 2026</p>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <p>Data source: <a href="https://www.kaggle.com/datasets/darkmatternet/airbnb-listings-nyc-london-paris-tokyo-and-more" target="_blank">Kaggle</a> · Original data: <a href="http://insideairbnb.com" target="_blank">Inside Airbnb</a> (CC BY 4.0) · Scraped March 2026</p>
+</footer>
+
+<script>
+    // Scroll-triggered fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
